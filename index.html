@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Discover the best dining, cafes, and bars in Chennai. Explore over 11,800 Zomato-listed restaurants with dynamic filtering, live interactive maps, and a surprise selector.">
+    <title>Chennai Restaurant Explorer - Find the Best Places to Eat</title>
+    
+    <!-- Google Fonts: Outfit (Headings) & Inter (Body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+
+    
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="light-theme">
+    
+    <!-- Top Progress Bar for loading JSON -->
+    <div id="loader-bar" class="loader-bar loading"></div>
+
+    <!-- MAIN WRAPPER -->
+    <div class="app-container">
+        
+        <!-- HEADER / HERO SECTION -->
+        <header class="app-header">
+            <div class="header-container">
+                <!-- Hamburger menu button for mobile filters -->
+                <button class="hamburger-menu-btn" id="mobile-hamburger-btn" aria-label="Toggle Filters">
+                    <i data-lucide="menu"></i>
+                </button>
+
+                <div class="logo-area">
+                    <span class="logo-icon">🍛</span>
+                    <div class="logo-text">
+                        <h1>Chennai Restaurant Explorer</h1>
+                        <p>Discover Madras' Best Bites</p>
+                    </div>
+                </div>
+
+                <div class="header-actions">
+                    <!-- Surprise Me Gourmet Roulette Trigger -->
+                    <button class="btn btn-primary roulette-trigger" id="roulette-open-btn" aria-label="Surprise Me Roulette">
+                        <i data-lucide="dice-5"></i>
+                        <span>Surprise Me!</span>
+                    </button>
+                    
+                    <!-- Dark/Light Theme Switcher -->
+                    <button class="theme-toggle" id="theme-toggle-btn" aria-label="Toggle Theme">
+                        <i data-lucide="moon" class="moon-icon"></i>
+                        <i data-lucide="sun" class="sun-icon"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN LAYOUT -->
+        <main class="main-content">
+            
+            <!-- LEFT COLUMN: FILTERS -->
+            <aside class="sidebar-filters" id="sidebar-filters">
+                <div class="sidebar-header">
+                    <div class="sidebar-title">
+                        <i data-lucide="sliders-horizontal"></i>
+                        <h2>Filters</h2>
+                    </div>
+                    <button class="btn-icon sidebar-close-btn" id="sidebar-close-btn" aria-label="Close Filters">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+                
+                <div class="filters-scroll-area">
+                    <!-- Search Input inside Filters -->
+                    <div class="filter-group">
+                        <label for="search-input">Search Location / Area</label>
+                        <div class="search-input-wrapper">
+                            <i data-lucide="map-pin" class="search-icon"></i>
+                            <input type="text" id="search-input" placeholder="e.g. Alandur, T. Nagar, Velachery..." autocomplete="off">
+                            <button id="search-clear-btn" class="search-clear-btn hidden" aria-label="Clear Search">
+                                <i data-lucide="x"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filter by Market Segment / Dining Type -->
+                    <div class="filter-group">
+                        <label>Dining Style</label>
+                        <div class="custom-select-wrapper" id="segment-select-wrapper">
+                            <div class="custom-select-trigger" id="segment-select-trigger">
+                                <i data-lucide="utensils" class="select-icon"></i>
+                                <span class="custom-select-value">All</span>
+                                <div class="arrow"></div>
+                            </div>
+                            <div class="custom-options-container" id="segment-options">
+                                <div class="custom-option selected" data-value="all">All</div>
+                                <div class="custom-option" data-value="Restaurant">Restaurant</div>
+                                <div class="custom-option" data-value="Cafe">Cafe</div>
+                                <div class="custom-option" data-value="Bar">Bar</div>
+                                <div class="custom-option" data-value="Hotel">Hotel</div>
+                                <div class="custom-option" data-value="Fast Food">Fast Food</div>
+                                <div class="custom-option" data-value="Bakery & Sweet Shop">Bakery & Sweet Shop</div>
+                                <div class="custom-option" data-value="Ice Cream Parlour">Ice Cream Parlour</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filter by Dining Rating -->
+                    <div class="filter-group">
+                        <div class="filter-label-row">
+                            <label for="rating-slider">Minimum Dining Rating</label>
+                            <span class="rating-val" id="rating-val-label">2.0 ★</span>
+                        </div>
+                        <input type="range" id="rating-slider" min="2.0" max="4.9" step="0.1" value="2.0" class="slider">
+                        <div class="slider-ticks">
+                            <span>2.0</span>
+                            <span>3.0</span>
+                            <span>4.0</span>
+                            <span>4.9</span>
+                        </div>
+                    </div>
+
+                    <!-- Filter by Cuisines -->
+                    <div class="filter-group">
+                        <label>Popular Cuisines</label>
+                        <!-- Popular Cuisine Quick-tags -->
+                        <div class="quick-tags" id="popular-cuisine-tags">
+                            <span class="tag-pill" data-cuisine="Biryani">Biryani</span>
+                            <span class="tag-pill" data-cuisine="South Indian">South Indian</span>
+                            <span class="tag-pill" data-cuisine="North Indian">North Indian</span>
+                            <span class="tag-pill" data-cuisine="Chinese">Chinese</span>
+                            <span class="tag-pill" data-cuisine="Arabian">Arabian</span>
+                        </div>
+                    </div>
+
+                    <!-- Features Checklist -->
+                    <div class="filter-group">
+                        <label>Specific Features</label>
+                        <div class="features-checklist">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="chk-veg" value="Vegetarian Only">
+                                <span class="checkmark"></span>
+                                <span class="checkbox-label"><i data-lucide="leaf"></i> Pure Veg Only</span>
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="chk-delivery" value="Home Delivery">
+                                <span class="checkmark"></span>
+                                <span class="checkbox-label"><i data-lucide="bike"></i> Home Delivery</span>
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="chk-booking" value="Table booking recommended, Table reservation required, Table booking for Groups">
+                                <span class="checkmark"></span>
+                                <span class="checkbox-label"><i data-lucide="calendar-check"></i> Takes Reservations</span>
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="chk-outdoor" value="Outdoor Seating">
+                                <span class="checkmark"></span>
+                                <span class="checkbox-label"><i data-lucide="sun"></i> Outdoor Seating</span>
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="chk-buffet" value="Buffet">
+                                <span class="checkmark"></span>
+                                <span class="checkbox-label"><i data-lucide="layers"></i> Offers Buffet</span>
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="chk-wheelchair" value="Wheelchair Accessible">
+                                <span class="checkmark"></span>
+                                <span class="checkbox-label"><i data-lucide="accessibility"></i> Wheelchair Accessible</span>
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="chk-livemusic" value="Live Music">
+                                <span class="checkmark"></span>
+                                <span class="checkbox-label"><i data-lucide="music"></i> Live Music</span>
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="chk-lgbtqia" value="LGBTQIA Friendly">
+                                <span class="checkmark"></span>
+                                <span class="checkbox-label"><i data-lucide="heart"></i> LGBTQIA Friendly</span>
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="chk-petfriendly" value="Pet Friendly">
+                                <span class="checkmark"></span>
+                                <span class="checkbox-label"><i data-lucide="dog"></i> Pet Friendly</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-footer">
+                    <button class="btn btn-outline" id="reset-filters-btn">Reset All</button>
+                </div>
+            </aside>
+
+            <!-- RIGHT SECTION: DUAL GRID & MAP SPLIT -->
+            <section class="explorer-body">
+                
+                <!-- View Mode and Sorting Options Row -->
+                <div class="controls-row">
+                    <div class="active-count" id="active-count-label">
+                        Showing 0 restaurants
+                    </div>
+
+                    <!-- Quick filters status indicators -->
+                    <div class="active-filters-badges" id="active-filters-badges">
+                        <!-- Populated by JS -->
+                    </div>
+                    
+                    <div class="controls-actions">
+                        <button class="btn btn-outline mobile-filter-trigger" id="mobile-filter-trigger-btn">
+                            <i data-lucide="sliders-horizontal"></i>
+                            <span>Filters</span>
+                        </button>
+
+                        <div class="sort-selector-wrapper">
+                            <label class="hide-tablet">Sort By:</label>
+                            <div class="custom-select-wrapper" id="sort-select-wrapper" style="min-width: 180px;">
+                                <div class="custom-select-trigger" id="sort-select-trigger">
+                                    <span class="custom-select-value">None</span>
+                                    <div class="arrow"></div>
+                                </div>
+                                <div class="custom-options-container" id="sort-options">
+                                    <div class="custom-option selected" data-value="none">None</div>
+                                    <div class="custom-option" data-value="rating-desc">Rating: High to Low</div>
+                                    <div class="custom-option" data-value="rating-asc">Rating: Low to High</div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+
+                <!-- SPLIT DISPLAY LAYER -->
+                <div class="display-panel-wrapper" id="display-panel-wrapper">
+                    
+                    <!-- GRID OF RESTAURANTS -->
+                    <div class="grid-panel" id="grid-panel">
+                        <div class="restaurant-grid" id="restaurant-grid">
+                            <!-- Cards dynamically injected here -->
+                        </div>
+                        
+                        <!-- High Performance Pagination / Load More button -->
+                        <div class="pagination-area" id="pagination-area">
+                            <button class="btn btn-outline" id="load-more-btn">Load More</button>
+                        </div>
+                    </div>
+
+
+                </div>
+
+            </section>
+        </main>
+
+        <!-- RESTAURANT DETAIL DRAWER (SLIDES IN FROM RIGHT) -->
+        <div class="drawer-overlay" id="drawer-overlay"></div>
+        <div class="detail-drawer" id="detail-drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-restaurant-name">
+            <button class="drawer-close-btn" id="drawer-close-btn" aria-label="Close details">
+                <i data-lucide="x"></i>
+            </button>
+
+            <div class="drawer-scroll-content" id="drawer-content">
+                <!-- Dynamic Content Injected Here -->
+                <div class="drawer-placeholder">
+                    <i data-lucide="store" class="placeholder-icon animate-pulse"></i>
+                    <h3>Select a restaurant to explore details</h3>
+                    <p>Get dish suggestions, category highlights, maps navigation, and Zomato booking links.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SURPRISE ME GOURMET ROULETTE MODAL -->
+        <div class="modal-overlay" id="roulette-modal-overlay">
+            <div class="roulette-modal" role="dialog" aria-modal="true" aria-labelledby="roulette-modal-title">
+                <button class="modal-close-btn" id="roulette-close-btn" aria-label="Close surprise roulette">
+                    <i data-lucide="x"></i>
+                </button>
+
+                <div class="roulette-modal-body">
+                    <span class="roulette-badge">🍽️ Chennai Restaurant Explorer Roulette</span>
+                    <h2 id="roulette-modal-title">Hungry but Undecided?</h2>
+                    <p class="roulette-subtitle">We will scan highly-rated restaurants matching your active filters and pick a winner!</p>
+
+                    <!-- Spinning Visual Screen -->
+                    <div class="roulette-machine">
+                        <div class="roulette-reel-outer">
+                            <div class="roulette-reel" id="roulette-reel">
+                                <div class="reel-item">Spin to Taste!</div>
+                            </div>
+                        </div>
+                        <div class="roulette-pin">👇</div>
+                    </div>
+
+                    <div class="roulette-actions">
+                        <button class="btn btn-primary" id="roulette-spin-btn">
+                            <i data-lucide="dices"></i> Spin the Wheel!
+                        </button>
+                    </div>
+
+                    <!-- Result Panel (Shown after spin completes) -->
+                    <div class="roulette-result-card hidden" id="roulette-result-card">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CDNs FOR LEAFLET AND LUCIDE -->
+    
+
+    
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom JS App logic -->
+    <script type="module" src="app.js"></script>
+</body>
+</html>
